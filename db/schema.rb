@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160201225509) do
+ActiveRecord::Schema.define(version: 20160201232550) do
 
   create_table "addresses", force: :cascade do |t|
     t.string   "street"
@@ -108,7 +108,6 @@ ActiveRecord::Schema.define(version: 20160201225509) do
 
   create_table "products", force: :cascade do |t|
     t.float    "price"
-    t.integer  "quantity"
     t.integer  "stock"
     t.string   "sku"
     t.string   "title"
