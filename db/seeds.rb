@@ -1,26 +1,15 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
-
 puts "Starting seeds...\n\n"
 start_time = Time.now
 
 puts "Removing old data..."
 # Blow away the existing data
+State.delete_all
+City.delete_all
+Airline.delete_all
 User.delete_all
-Category.delete_all
-Payment.delete_all
-Order.delete_all
-OrderItem.delete_all
-Product.delete_all
-Category.delete_all
-Cart.delete_all
-CartItem.delete_all
-Address.delete_all
+Flight.delete_all
+Itinerary.delete_all
+Ticket.delete_all
 puts "Old data removed.\n\n"
 
 
@@ -67,6 +56,14 @@ STATES =
 "South Dakota", "Tennessee", "Texas", "Utah", "Vermont",
 "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"]
 
+
+CATEGORY =
+["Book", "Toy", "Women's Clothing", "Shoes", "Plant",
+"Car Equipment", "Computer", "Home Appliance", "Dog Food", "Cosmetic",
+"Office Supplies", "Produce", "Medicine"]
+
+
+
 puts "Creating States..."
 STATES.each do |state_name|
   State.create({:name => state_name})
@@ -102,16 +99,27 @@ puts "Airlines created.\n\n"
 
 puts "Creating Users..."
 (MULTIPLIER * 25).times do
-  fname =  Faker::Name.first_name
-  lname = Faker::Name.last_name
-  User.create( city_id: City.pluck(:id).sample,
-               state_id: State.pluck(:id).sample,
-               username: Faker::Internet.user_name,
-               email: Faker::Internet.email("#{fname} #{lname}"),
-               first_name: fname,
-               last_name: lname  )
+  User.create( name: Faker::Internet.user_name,
+               email: Faker::Internet.email("#{name}") )
 end
 puts "Users created.\n\n"
+
+puts "Creating Categories..."
+(MULTIPLIER * 25).times do
+  Category.create( description: CATEGORTY.sample )
+end
+puts "Categories created.\nn"
+
+puts "Creating Product..."
+(MULTIPLIER * 25).times do
+  Category.create( price: Faker::Commerce.price.to_f,
+                   stock: random(100..1000),
+                   title: Faker::Commerce.product_name,
+                   description: Faker::Lorem.sentence,
+                   sku: Faker::Code.isbn,
+                   category_id: Category.all.sample.id,)
+end
+puts "Products created.\n\n"
 
 
 puts "Creating Flights..."
