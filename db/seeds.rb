@@ -3,13 +3,12 @@ start_time = Time.now
 
 puts "Removing old data..."
 # Blow away the existing data
-State.delete_all
-City.delete_all
-Airline.delete_all
 User.delete_all
-Flight.delete_all
-Itinerary.delete_all
-Ticket.delete_all
+Product.delete_all
+Order.delete_all
+Category.delete_all
+OrderItem.delete_all
+Address.delete_all
 puts "Old data removed.\n\n"
 
 
@@ -17,7 +16,7 @@ puts "Old data removed.\n\n"
 # increase your seed size by changing this
 # NOTE: This can make it take MUCH longer!
 # A value of 10 can take over 3 minutes
-MULTIPLIER = 10
+MULTIPLIER = 5
 
 
 srand(42)
@@ -34,13 +33,6 @@ end
 
 def random_hours_later(time)
   time + rand(7).hours + rand(60).minutes
-end
-
-def airport_code
-  letters = Array("A".."Z")
-  result = ''
-  3.times{ result << letters.sample }
-  result
 end
 
 # CREATE STATES
@@ -64,99 +56,70 @@ CATEGORY =
 
 
 
-puts "Creating States..."
-STATES.each do |state_name|
-  State.create({:name => state_name})
-end
-puts "States created.\n\n"
-
-
-puts "Creating Cities..."
-State.all.each do |state|
-  MULTIPLIER.times do
-    City.create( name: Faker::Address.city )
-  end
-end
-puts "Cities created.\n\n"
-
-
-puts "Creating Airports..."
-City.all.each do |city|
-  Airport.create(city_id:  city.id,
-                 long_name: "#{city.name} Probably International Airport",
-                 state_id: State.all.sample.id,
-                 code: airport_code )
-end
-puts "Airports created.\n\n"
-
-
-puts "Creating Airlines..."
-MULTIPLIER.times do
-  Airline.create(name: "#{Faker::Company.name} #{["Air", "Airlines", "Flights"].sample}")
-end
-puts "Airlines created.\n\n"
-
-
 puts "Creating Users..."
-(MULTIPLIER * 25).times do
-  User.create( name: Faker::Internet.user_name,
-               email: Faker::Internet.email("#{name}") )
+(MULTIPLIER * 20).times do
+  name = Faker::Internet.user_name
+  User.create( name: name,
+               email: Faker::Internet.email(name) )
 end
-puts "Users created.\n\n"
+
 
 puts "Creating Categories..."
-(MULTIPLIER * 25).times do
-  Category.create( description: CATEGORTY.sample )
+CATEGORY.each do |cat|
+  Category.create( description: cat )
 end
-puts "Categories created.\nn"
+
 
 puts "Creating Product..."
-(MULTIPLIER * 25).times do
-  Category.create( price: Faker::Commerce.price.to_f,
-                   stock: random(100..1000),
+(MULTIPLIER * 6).times do
+  Product.create( price: Faker::Commerce.price.to_f,
+                   stock: rand(100..1000),
                    title: Faker::Commerce.product_name,
                    description: Faker::Lorem.sentence,
                    sku: Faker::Code.isbn,
                    category_id: Category.all.sample.id,)
 end
-puts "Products created.\n\n"
 
 
-puts "Creating Flights..."
-Airline.all.each do |airline|
-  (MULTIPLIER * 100).times do
-    origin_id, destination_id = Airport.pluck(:id).sample(2)
-    departure_time = random_time
-    Flight.create(origin_id: origin_id,
-                  destination_id: destination_id,
-                  departure_time: departure_time,
-                  airline_id: Airline.pluck(:id).sample,
-                  arrival_time: random_hours_later(departure_time),
-                  price: rand(99.99..850.00).round(2),
-                  distance: rand(100..600))
-  end
-end
-puts "Flights created.\n\n"
-
-
-puts "Creating Itineraries..."
+puts "Creating Address..."
 User.all.each do |user|
-  rand(4).times do
-    Itinerary.create!(user_id: user.id,
-                     payment_method: PAYMENT_METHODS.sample)
+  default_address = true
+  rand(1..5).times do
+    Address.create( user_id: user.id,
+                        street: Faker::Address.street_name,
+                        city: Faker::Address.city,
+                        state: Faker::Address.state,
+                        country: "USA",
+                        zip: Faker::Address.zip.to_i,
+                        default: default_address )
+    default_address = false
   end
 end
-puts "Itineraries created.\n\n"
 
-
-puts "Creating Tickets..."
-Itinerary.all.each do |itinerary|
-  rand(MULTIPLIER).times do
-    Ticket.create(itinerary_id: itinerary.id,
-                  flight_id: Flight.pluck(:id).sample)
-  end
+puts "Creating Orders..."
+(MULTIPLIER * 20).times do
+  user = User.all.sample
+  address = Address.find_by(user_id: user.id)
+  Order.create( user_id: user.id,
+                   shipping_street: address.street,
+                   shipping_city: address.city,
+                   shipping_state: address.state,
+                   shipping_zip: address.zip.to_i,
+                   shipping_country: address.country,
+                   billing_street: address.street,
+                   billing_city: address.city,
+                   billing_state: address.state,
+                   billing_zip: address.zip.to_i,
+                   billing_country: address.country,
+                   phone_number: Faker::PhoneNumber.phone_number.gsub(".", "").to_i,
+                   )
 end
-puts "Tickets created.\n\n"
+
+Order.each do |order|
+  Payment.create(user_id: order.user_id,
+                card_number: Faker::Business.credit_card_number)
+
+end
 
 
 puts "\n\nALL DONE!!!"

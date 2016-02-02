@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160201232550) do
+ActiveRecord::Schema.define(version: 20160202003802) do
 
   create_table "addresses", force: :cascade do |t|
     t.string   "street"
@@ -72,12 +72,12 @@ ActiveRecord::Schema.define(version: 20160201232550) do
     t.string   "billing_city"
     t.string   "billing_state"
     t.integer  "billing_zip"
-    t.integer  "phone_number"
+    t.integer  "phone_number",     limit: 8
     t.string   "status"
     t.float    "total"
     t.integer  "user_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
     t.string   "shipping_country"
     t.string   "billing_country"
   end
