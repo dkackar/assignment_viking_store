@@ -115,12 +115,25 @@ puts "Creating Orders..."
                    )
 end
 
-Order.each do |order|
+Order.all.each do |order|
   Payment.create(user_id: order.user_id,
-                card_number: Faker::Business.credit_card_number)
-
+                card_number: Faker::Business.credit_card_number,
+                company_name: Faker::Business.credit_card_type,
+                expiry_date: Faker::Business.credit_card_expiry_date,
+                first_name: Faker::Name.first_name,
+                first_name: Faker::Name.last_name)
 end
 
+
+Order.all.each do |order|
+  4.times do |num|
+    product = Product.all.sample
+    OrderItem.create(order_id: order.id,
+                product_id: product.id,
+                price: product.price,
+                quantity: rand(1..5))
+  end       
+end
 
 puts "\n\nALL DONE!!!"
 puts "It took #{Time.now - start_time} seconds."
