@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160202003802) do
+ActiveRecord::Schema.define(version: 20160202004745) do
 
   create_table "addresses", force: :cascade do |t|
     t.string   "street"
@@ -85,14 +85,14 @@ ActiveRecord::Schema.define(version: 20160202003802) do
   add_index "orders", ["user_id"], name: "index_orders_on_user_id"
 
   create_table "payments", force: :cascade do |t|
-    t.integer  "card_number"
+    t.integer  "card_number",  limit: 8
     t.string   "company_name"
     t.string   "first_name"
     t.string   "last_name"
     t.date     "expiry_date"
     t.integer  "user_id"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   add_index "payments", ["user_id"], name: "index_payments_on_user_id"
